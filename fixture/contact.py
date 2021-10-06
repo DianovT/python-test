@@ -207,47 +207,6 @@ class ContactHelper:
         wd.find_element_by_link_text("home page").click()
         self.contact_cache = None
 
-    def add_to_group(self, id, group_id):
-        wd = self.app.wd
-        self.open_home_page()
-        Select(wd.find_element_by_name("group")).select_by_visible_text('[none]')
-        self.select_contact_by_id(id)
-        wd.find_element_by_css_selector("select[name = 'to_group'] > option[value = '%s']" % group_id.id).click()
-        #Select(wd.find_element_by_name("to_group")).select_by_value("'%s'" % group_id.id)
-        wd.find_element_by_css_selector('input[value="Add to"]').click()
-        wd.find_element_by_link_text('group page "test"').click()
-        wd.find_element_by_link_text("home").click()
-        self.contact_cache = None
 
-
-    def delete_from_group(self, id, group_id):
-        wd = self.app.wd
-        self.open_home_page()
-        wd.find_element_by_css_selector("select[name = 'group'] > option[value = '%s']" % group_id.id).click()
-        self.select_contact_by_id(id)
-        wd.find_element_by_css_selector('input[name="remove"]').click()
-        wd.find_element_by_link_text("home").click()
-        self.contact_cache = None
-
-    def delete_contact_from_group(self, id, group):
-        wd = self.app.wd
-        wd.find_element_by_css_selector("select[name = 'group'] > option[value = '%s']" % group.id).click()
-        wd.find_element_by_css_selector("input[value='%s']" % id).click()
-        wd.find_element_by_name("remove")
-        wd.find_element_by_name("remove").click()
-        wd.find_element_by_css_selector("div.msgbox")
-        self.contacts_cache = None
-
-
-    def get_contacts_in_groups(self):
-        if self.contact_cache is None:
-            wd = self.app.wd
-            self.contact_cache = []
-            for row in wd.find_elements_by_name("entry"):
-                cells = row.find_elements_by_tag_name("td")
-                id = cells[0].find_element_by_name("selected[]").get_attribute("value")
-                group_id = wd.find_element_by_css_selector('input[name="group"]').get_attribute("value")
-                self.contact_cache.append(Contact(id=id, group_id=group_id))
-            return list(self.contact_cache)
 
 

@@ -2,8 +2,7 @@ from pony.orm import *
 from datetime import datetime
 from model.group import Group
 from model.contact import Contact
-from pymysql.converters import decoders
-
+from model.contact_in_group import Contact_in_Group
 
 class ORMfixture:
 
@@ -15,8 +14,8 @@ class ORMfixture:
         name = Optional(str, column='group_name')
         header = Optional(str, column='group_header')
         footer = Optional(str, column='group_footer')
-        contacts = Set(lambda: ORMfixture.ORMContact, table="address_in_groups", column="id",
-                       reverse="groups", lazy=True)
+        contact_id = Set(lambda: ORMfixture.ORMContact, table="address_in_groups", column="id", reverse="group_id",
+                       lazy=True)
 
     class ORMContact(db.Entity):
         _table_ = 'addressbook'
@@ -24,11 +23,11 @@ class ORMfixture:
         firstname = Optional(str, column='firstname')
         lastname = Optional(str, column='lastname')
         deprecated = Optional(datetime, column='deprecated')
-        groups = Set(lambda: ORMfixture.ORMGroup, table="address_in_groups", column="group_id",
-                     reverse="contacts", lazy=True)
+        group_id = Set(lambda: ORMfixture.ORMGroup, table="address_in_groups", column="group_id", reverse="contact_id",
+                     lazy=True)
 
     def __init__(self, host, name, user, password):
-        self.db.bind('mysql', host=host, database=name, user=user, password=password)#, conv=decoders)
+        self.db.bind('mysql', host=host, database=name, user=user, password=password)
         self.db.generate_mapping()
         sql_debug(True)
 
@@ -51,12 +50,24 @@ class ORMfixture:
         return self.convert_contact_to_model(select(c for c in ORMfixture.ORMContact if c.deprecated is None))
 
     @db_session
-    def get_contacts_in_groups(self, group):
+    def get_contacts_in_group(self, group):
         orm_group = list(select(g for g in ORMfixture.ORMGroup if g.id == group.id))[0]
-        return self.convert_contact_to_model(orm_group.contacts)
+        return self.convert_contacts_to_model(orm_group.contact_id)
 
     @db_session
-    def get_contacts_not_in_groups(self, group):
+    def get_contacts_not_in_group(self, group):
         orm_group = list(select(g for g in ORMfixture.ORMGroup if g.id == group.id))[0]
-        return self.convert_contact_to_model(
-                select(c for c in ORMfixture.ORMContact if c.deprecated is None and orm_group not in c.groups))
+        return self.convert_contacts_to_model(select(c for c in ORMfixture.ORMContact if c.deprecated is None
+                                                     and orm_group not in c.groups))
+    @db_session
+    def get_groups_with_contacts(self):
+        list_groups = []
+        group = self.db.select("group_id from address_in_groups")
+        for i in group:
+            list_groups.append(Contact_in_Group(id=str(i)))
+        return list_groups
+
+    def convert_contacts_to_model(self, contacts):
+        def convert(contact):
+            return Contact(id=str(contact.id), firstname=contact.firstname, lastname=contact.lastname)
+        return list(map(convert, contacts))

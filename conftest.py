@@ -1,5 +1,6 @@
 from fixture.application import Application
 from fixture.db import DbFixture
+from fixture.orm import ORMfixture
 import pytest
 import json
 import os.path
@@ -39,6 +40,13 @@ def db(request):
     return dbfixture
 
 
+@pytest.fixture(scope="session")
+def orm(request):
+    db_config = load_config(request.config.getoption("--target"))["db"]
+    db_orm_fixture = ORMfixture(host=db_config["host"], name=db_config["name"], user=db_config["user"], password=db_config["password"])
+    return db_orm_fixture
+
+
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", default="firefox")
     parser.addoption("--target", action="store", default="target.json")
@@ -59,8 +67,8 @@ def load_from_module(module):
     return importlib.import_module("data.%s" % module).testdate
 
 def load_from_json(file):
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ("data/%s.json" % file))) as f:
-        return jsonpickle.decode(f.read())
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/%s.json" % file)) as file_json:
+        return jsonpickle.decode(file_json.read())
 
 
 @pytest.fixture(scope="session", autouse=True)
