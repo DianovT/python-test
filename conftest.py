@@ -24,7 +24,7 @@ def app(request):
     global fixture
     global target
     browser = request.config.getoption("--browser")
-    web_config = load_config(request.config.getoption("--target")) ['web']
+    web_config = load_config(request.config.getoption("--target"))['web']
     if fixture is None or not fixture.is_valid():
         fixture = Application(browser=browser, base_url=web_config['baseUrl'])
     fixture.session.insure_login(username=web_config['username'], password=web_config['password'])
