@@ -3,13 +3,14 @@ from fixture.session import SessionHelper
 from fixture.group import GroupHelper
 from fixture.contact import ContactHelper
 from fixture.contact_in_group import Contact_in_Group_Helper
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 class Application:
 
     def __init__(self, browser, base_url):
         if browser == "firefox":
-            self.wd = webdriver.Firefox()
+            self.wd = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         elif browser == "chrome":
             self.wd = webdriver.Chrome()
         elif browser == "IE":
