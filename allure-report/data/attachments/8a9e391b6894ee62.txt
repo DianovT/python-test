@@ -1,0 +1,6 @@
+[WDM] - 
+
+[WDM] - ====== WebDriver manager ======
+[WDM] - Current firefox version is 70.0.1
+[WDM] - Get LATEST driver version for 70.0.1
+[WDM] - Driver [C:\Users\AD\.wdm\drivers\geckodriver\win64\v0.30.0\geckodriver.exe] found in cache

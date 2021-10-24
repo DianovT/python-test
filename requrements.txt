@@ -1,4 +1,4 @@
-pytest
+pytest==2.9.0
 pytest-bdd
 PyMySQL
 jsonpickle
@@ -6,3 +6,5 @@ pony
 selenium
 mysql-connector-python-rf
 webdriver-manager
+allure-pytest
+lxml-4.6.2-cp36-cp36m-win_amd64.whl
